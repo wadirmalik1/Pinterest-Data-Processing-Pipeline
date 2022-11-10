@@ -1,0 +1,6 @@
+{
+    "git.branchPrefix": "Pintrest",
+    "git.enableCommitSigning": true,
+    "git.fetchOnPull": true,
+    "git.repositoryScanMaxDepth": 3
+}
