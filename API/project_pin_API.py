@@ -27,7 +27,7 @@ def get_db_row(item: Data):
     data = dict(item)
     producer = KafkaProducer(bootstrap_servers='localhost:9092', value_serializer=lambda x: dumps(x).encode('utf-8'))
     for _ in range(100):
-         producer.send('PintrestTopic', value=data)
+         producer.send('PintrestTopic2', value=data)
     
 
 

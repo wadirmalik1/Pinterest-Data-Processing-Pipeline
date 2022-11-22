@@ -3,12 +3,11 @@ from pyspark.sql import SparkSession
 from tkinter.tix import COLUMN
 import pyspark.sql.functions as f
 import pyspark.sql.types as T
-from pyspark.sql.types import IntegerType
 
 # Download spark sql kakfa package from Maven repository and submit to PySpark at runtime. 
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.1,org.postgresql:postgresql:42.2.10 pyspark-shell'
 # specify the topic we want to stream data from.
-kafka_topic_name = "PintrestTopic"
+kafka_topic_name = "PintrestTopic2"
 # Specify your Kafka server to read data from.
 kafka_bootstrap_servers = 'localhost:9092'
 
@@ -26,7 +25,7 @@ stream_df = spark \
         .format("kafka") \
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
         .option("subscribe", kafka_topic_name) \
-        .option("startingOffsets", "earliest") \
+        .option("startingOffsets", "latest") \
         .load()
 
 # Select the value part of the kafka message and cast it to a string.
@@ -49,10 +48,7 @@ parsed = stream_df.withColumn("temp", f.explode(f.from_json("value", schema))).s
 
 
 # Clean the data
-parsed = parsed.withColumnRenamed("index", "position") \
-    .withColumn("position" , f.col("position").cast(IntegerType())) \
-    .withColumn("unique_id" , f.col("unique_id").cast(IntegerType())) \
-    .withColumn("title", f.regexp_replace("title", "No Title Data Available", "unknown")) \
+parsed = parsed.withColumn("title", f.regexp_replace("title", "No Title Data Available", "unknown")) \
     .withColumn("description", f.regexp_replace("description", "No description available Story format", "unknown")) \
     .withColumn("follower_count", f.regexp_replace("follower_count", "User Info Error", "unknown")) \
     .withColumn("tag_list", f.regexp_replace("tag_list", "N,o, ,T,a,g,s, ,A,v,a,i,l,a,b,l,e", "unknown"))
@@ -74,10 +70,14 @@ parsed.writeStream \
     .awaitTermination()
 
 
-   
-    #    .format("c") \
-   # .outputMode("update") \
- 
 
+#.option("checkpointLocation","/Users/wadirmalik/Desktop/kafka_2.12-3.2.1/checkpoint") \
+       #.format("console") \
+    #.outputMode("update") \
+
+ 
+#.withColumn("position" , f.col("position").cast(T.IntegerType())) \
+    #.withColumn("downloaded" , f.col("downloaded").cast(T.IntegerType())) \
+    #.withColumn("unique_id" , f.col("unique_id").cast(T.StringType())) \
 
 
