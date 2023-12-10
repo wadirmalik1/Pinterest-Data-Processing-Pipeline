@@ -34,13 +34,17 @@ hadoopConf.set('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoo
 spark=SparkSession(sc)
 
 # Read from the S3 bucket
-df = spark.read.json("s3a://pinterest-data-34b08b92-1082-4d4f-a6e7-924a8ae2a66e/*.json") # You may want to change this to read csv depending on the files your reading from the bucket
+df = spark.read.json("s3a://pinterest-data-34b08b92-1082-4d4f-a6e7-924a8ae2a66e/*.json") 
 
 df = df.withColumnRenamed("index", "position") \
     .withColumn("title", f.regexp_replace("title", "No Title Data Available", "unknown")) \
     .withColumn("description", f.regexp_replace("description", "No description available Story format", "unknown")) \
     .withColumn("follower_count", f.regexp_replace("follower_count", "User Info Error", "unknown")) \
-    .withColumn("tag_list", f.regexp_replace("tag_list", "N,o, ,T,a,g,s, ,A,v,a,i,l,a,b,l,e", "unknown"))
+    .withColumn("tag_list", f.regexp_replace("tag_list", "N,o, ,T,a,g,s, ,A,v,a,i,l,a,b,l,e", "unknown")) \
+    .withColumn("follower_count", f.regexp_replace("follower_count", "k", "000")) \
+    .withColumn("follower_count", f.col("follower_count").cast(IntegerType())) \
+    .withColumn("downloaded" , f.col("downloaded").cast(IntegerType())) 
+
 
 df.show()
 

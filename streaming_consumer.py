@@ -51,7 +51,11 @@ parsed = stream_df.withColumn("temp", f.explode(f.from_json("value", schema))).s
 parsed = parsed.withColumn("title", f.regexp_replace("title", "No Title Data Available", "unknown")) \
     .withColumn("description", f.regexp_replace("description", "No description available Story format", "unknown")) \
     .withColumn("follower_count", f.regexp_replace("follower_count", "User Info Error", "unknown")) \
-    .withColumn("tag_list", f.regexp_replace("tag_list", "N,o, ,T,a,g,s, ,A,v,a,i,l,a,b,l,e", "unknown"))
+    .withColumn("tag_list", f.regexp_replace("tag_list", "N,o, ,T,a,g,s, ,A,v,a,i,l,a,b,l,e", "unknown")) \
+    .withColumn("follower_count", f.regexp_replace("follower_count", "k", "000")) \
+    .withColumn("follower_count", f.col("follower_count").cast(IntegerType())) \
+    .withColumn("downloaded" , f.col("downloaded").cast(IntegerType())) 
+
 
 parsed.printSchema()
 # Upload data onto postgres
